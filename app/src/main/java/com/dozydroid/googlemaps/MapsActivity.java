@@ -19,6 +19,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     Button btnMove;
+    double myLatitude, myLongitude;
+    GPSTracker gpsTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        gpsTracker = new GPSTracker(MapsActivity.this);
+        if(gpsTracker.canGetLocation){
+            myLatitude = gpsTracker.getLatitude();
+            myLongitude = gpsTracker.getLongitude();
+            LatLng myLocation = new LatLng(myLatitude, myLongitude);
+            mMap.addMarker(new MarkerOptions().position(myLocation));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+        }else{
+            gpsTracker.showSettingsAlert();
+        }
         btnMove = (Button) findViewById(R.id.btnMove);
         btnMove.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +58,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
-                mMap.setMyLocationEnabled(true);
+//                mMap.setMyLocationEnabled(true);
             }
         });
     }
